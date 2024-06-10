@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stock Price Dashboard</title>
+    <link rel="stylesheet" href="/styles/dashboard.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="title">Stock Price Details</div>
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/login.html">Login</a></li>
+                    <li><a href="/signup.html">Sign Up</a></li>
+                    <li><a href="/dashboard">Dashboard</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <section>
+        <marquee>Welcome to the Stock Price Dashboard!</marquee>
+        <h1>Welcome, <%= username %>!</h1>
+        <div class="search-box">
+            <form id="stockPriceSearchForm">
+                <input type="text" id="stockSymbol" name="symbol" placeholder="Enter stock symbol" required>
+                <button type="submit">Search</button>
+            </form>
+        </div>
+        <div id="stockPriceInfo"></div>
+        <h2>Stock Price List</h2>
+        <ul>
+            <% stockPrices.forEach(stock => { %>
+                <li><%= stock.symbol %> - <%= stock.price %></li>
+            <% }) %>
+        </ul>
+        <h2>Add a Stock</h2>
+        <form action="/addStock" method="POST">
+            <input type="text" name="symbol" placeholder="Symbol" required>
+            <input type="text" name="price" placeholder="Price" required>
+            <button type="submit">Add Stock</button>
+        </form>
+    </section>
+    <footer>
+        <p>&copy; 2024 Stock Price Dashboard. All rights reserved.</p>
+    </footer>
+    <script>
+        document.getElementById('stockPriceSearchForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const symbol = document.getElementById('stockSymbol').value;
+
+            fetch('/getStockPrice?symbol=' + symbol)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        document.getElementById('stockPriceInfo').innerHTML = '<p>' + data.error + '</p>';
+                    } else {
+                        document.getElementById('stockPriceInfo').innerHTML = '<h3>' + data.symbol + '</h3><p>Price: $' + data.price + '</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching stock price data:', error);
+                    document.getElementById('stockPriceInfo').innerHTML = '<p>Error fetching data</p>';
+                });
+        });
+    </script>
+</body>
+</html>
